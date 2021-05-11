@@ -1,0 +1,148 @@
+#include <IRremote.h>
+
+// C++ code
+//
+
+IRrecv irrecive(6);//6번 핀을 IR수신으로 사용
+decode_results results;//결과값을 받는 변수 설정
+
+void setup()
+{
+  Serial.begin(9600);
+  irrecive.enableIRIn();
+  pinMode(9,OUTPUT);
+  pinMode(10,OUTPUT);
+  pinMode(11,OUTPUT);
+  pinMode(12,OUTPUT);
+  
+  
+}
+
+void clear()
+{
+  digitalWrite(12,LOW);
+  digitalWrite(11,LOW);
+  digitalWrite(10,LOW);
+  digitalWrite(9,LOW);
+}
+
+void loop()
+{
+  int i = 0;
+  int count=0;
+  
+  if(irrecive.decode(&results)==true)
+  {
+    Serial.println(results.value,HEX);
+    switch(results.value)
+    {
+      case 0xFD30CF :
+      {
+       	clear();
+      }
+      break;
+      case 0xFD08F7 :
+      {
+       	clear();
+        digitalWrite(9,HIGH);
+      }
+      break;
+      case 0xFD8877 :
+      {
+        clear();
+        digitalWrite(10,HIGH);
+      }
+      break;
+      case 0xFD48B7 :
+      {
+       	clear();
+        digitalWrite(11,HIGH);
+      }
+      break;
+      case 0xFD28D7 :
+      {
+        clear();
+        digitalWrite(12,HIGH);
+      }
+      break;
+      case 0xFDA857 :
+      {
+        clear();
+        digitalWrite(9,HIGH);
+        digitalWrite(11,HIGH);
+      }
+      break;
+      case 0xFD6897 :
+      {
+        clear();
+        digitalWrite(10,HIGH);
+        digitalWrite(12,HIGH);
+      }
+      break;
+      case 0xFD18E7 :
+      {
+        clear();
+        i=0;
+        while(i<5)
+        {
+          clear();
+          delay(200);
+          digitalWrite(9,HIGH);
+          delay(200);
+          digitalWrite(10,HIGH);
+          delay(200);
+          digitalWrite(11,HIGH);
+          delay(200);
+          digitalWrite(12,HIGH);
+          delay(200);
+          i=i+1;
+        }
+      }
+      break;
+      case 0xFD9867 :
+      {
+        clear();
+        i=0;
+        while(i<5)
+        {
+         clear();
+         delay(200);
+         digitalWrite(12,HIGH);
+       	 delay(200);
+         digitalWrite(11,HIGH);
+         delay(200);
+         digitalWrite(10,HIGH);
+         delay(200);
+         digitalWrite(9,HIGH);
+         delay(200);
+         i=i+1;
+        }
+      }
+      break;
+      case 0xFD58A7 :
+      {
+        clear();
+        i=0;
+        while(i<5)
+        {
+         clear();
+         delay(200);
+         digitalWrite(12,HIGH);
+         digitalWrite(11,HIGH);
+         digitalWrite(10,HIGH);
+         digitalWrite(9,HIGH);
+         delay(200);
+         i=i+1;
+        }
+      }
+      break;
+      default : {
+        		 digitalWrite(12,LOW);
+                 digitalWrite(11,LOW);
+        		 digitalWrite(10,LOW);
+        		 digitalWrite(9,LOW);
+                }
+    }
+    irrecive.resume();//다음 신호 수신
+  }
+}
