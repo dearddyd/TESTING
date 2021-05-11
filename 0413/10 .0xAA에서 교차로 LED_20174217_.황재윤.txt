@@ -1,0 +1,25 @@
+#include<avr/io.h>
+#include<util/delay.h>
+
+int main(void)
+{
+	int count = 0;
+	DDRA = 0xFF;
+	DDRC = 0xFF;
+
+	while( count<8 )
+	{
+		if( count%2 ==0)
+		{
+			PORTA = ~0xAA;
+			PORTC = 0x55;
+			_delay_ms(500);
+		}else
+		{
+			PORTA = ~0x55;
+			PORTC = 0xAA;
+			_delay_ms(500);
+		}
+		count = count + 1;
+	}
+}
