@@ -1,0 +1,125 @@
+#include <avr/io.h>
+#include <util/delay.h>
+// 키 패드 값 상수 지정
+#define KEY1 0x11 // 완성된 KEY 코드값 = 
+					// (KEY 스캔용 데이터 패턴 1Bit) + (스캔된 KEY 코드값)
+#define KEY2 0x12
+#define KEY3 0x14
+#define KEY4 0x21
+#define KEY5 0x22
+#define KEY6 0x24
+#define KEY7 0x41
+#define KEY8 0x42
+#define KEY9 0x44
+#define KEYA 0x81
+#define KEY0 0x82
+#define KEYB 0x84
+// 채터링을 제거한 스캔된 KEY 코드값 얻는 함수
+unsigned char getKeycode()
+{
+ unsigned char input, i;
+ input = PINA & 0x07; // PORTA로 들어오는 입력신호 중에서 
+// 하위 3Bit(스캔된 KEY코드)를 저장함
+ for(i = 0; i < 10; i++) // 채터링을 검사하기 위한 루프
+ { // 10회(5mSec) 동안 같은 값이 읽히면 채터링 없이
+ // 안정되게 KEY가 눌러진 상태로 인정함
+ _delay_us(500);
+ if(input != (PINA & 0x07)) // 채터링 검출
+ return 0; // 이전값과 다른 값이면 채터링으로 간주함
+ }
+ return input; // 10회 동안 같은값이 검출된 경우
+}
+// 완성된 KEY 코드값 얻는 함수
+unsigned char key_check()
+{
+ unsigned char input = 0;
+ unsigned char output = 0;
+ output = 0x10; // KEY 스캔용 데이터 패턴 1Bit 준비 
+ PORTB = output; // PB4단자 =‘1’­­> KEY_R0단자
+ input = getKeycode(); //스캔된 KEY 코드값 얻기
+ if(input != 0) 
+ return (output | input); // 완성된 KEY 코드값 형성
+ // (KEY 스캔용 데이터 패턴 1Bit) + (스캔된 KEY코드값)
+ 
+ output = 0x20; // KEY 스캔용 데이터 패턴 1Bit 준비 
+ PORTB = output; // PB4단자 =‘1’­­> KEY_R0단자
+ input = getKeycode(); //스캔된 KEY 코드값 얻기
+ if(input != 0) 
+ return (output | input);
+
+  output = 0x40; // KEY 스캔용 데이터 패턴 1Bit 준비 
+ PORTB = output; // PB4단자 =‘1’­­> KEY_R0단자
+ input = getKeycode(); //스캔된 KEY 코드값 얻기
+ if(input != 0) 
+ return (output | input);
+
+  output = 0x80; // KEY 스캔용 데이터 패턴 1Bit 준비 
+ PORTB = output; // PB4단자 =‘1’­­> KEY_R0단자
+ input = getKeycode(); //스캔된 KEY 코드값 얻기
+ if(input != 0) 
+ return (output | input);
+
+ return 0xFF; // 채터링 중 또는 키가 눌려지지 않은 상태
+}
+int main()
+{
+ unsigned char key_value = 0x00;
+ DDRA = 0xF8; // KEY 코드값을 입력
+
+DDRB = 0xF0; // KEY 스캔용 데이터 패턴 1Bit를 출력하기 
+ // 위해 PORTB의 PB4핀을 출력으로 설정
+ DDRC = 0xFF; // LED로 출력하기 위해 PORTC를 출력으로 설정 
+ PORTC = 0; // LED OFF
+ DDRD=0xFF;
+ PORTD=0xFF;
+ while(1)
+ {
+ key_value = key_check(); // 완성된 KEY 코드값 얻기
+ switch(key_value) // 눌러진 KEY 검사 
+ {
+ case KEY1 : // KEY1이 눌렸을 경우
+ PORTC = 0x01; // LED0 ON
+ break;
+ case KEY2 : // KEY2가 눌렸을 경우
+ PORTC = 0x02; // LED1 ON
+ break;
+ case KEY3 : // KEY3이 눌렸을 경우
+ PORTC = 0x04; // LED2 ON
+ break;
+ case KEY4:
+ PORTC = 0x08;
+ break;
+ case KEY5:
+ PORTC = 0x10;
+ break;
+ case KEY6:
+ PORTC = 0x20;
+ break;
+  case KEY7:
+ PORTC = 0x40;
+ break;
+  case KEY8:
+ PORTC = 0x80;
+ break;
+  case KEY9:
+ PORTD = 0xFE;
+ break;
+   case KEY0:
+ PORTD = 0xFD;
+ break;
+   case KEYA:
+ PORTD = 0xFB;
+ break;
+   case KEYB:
+ PORTD = 0xF7;
+ break;
+
+ default : // 아무것도 안 누른 경우
+ PORTC = 0; // 모든 LED OFF
+ PORTD=0xFF;
+ break;
+ }
+ }
+ return 0;
+}
+
