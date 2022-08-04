@@ -1,0 +1,30 @@
+#include <avr/io.h>
+#include <util/delay.h>
+
+int main (void)
+{
+	unsigned char  led;
+	int count = 0;
+	DDRA = 0xFF;
+	DDRC = 0xFF;
+
+	while(count < 8)
+	{
+		led = 0xFF;
+
+		if( count%2 ==0)
+		{
+			PORTA = ~0x00;
+			PORTC = led;
+			_delay_ms(500);
+		}
+		
+		if (count%2 == 1)
+		{
+			PORTA = ~led;
+			PORTC = 0x00;
+			_delay_ms(500);
+		}
+		count = count + 1;
+	}
+}

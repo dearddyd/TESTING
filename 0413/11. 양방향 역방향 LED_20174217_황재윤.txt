@@ -1,0 +1,25 @@
+#include<avr/io.h>
+#include<util/delay.h>
+
+int main(void)
+{
+	unsigned char i, led, led2;
+	i=0;
+	led=0x80; //PORTC
+	led2=0x01; //PORTA
+	
+	DDRA=0xFF;
+	DDRC=0xFF;
+	
+	PORTA = ~led2;
+	PORTC = led;
+	
+	for(i = 0 ; i < 7 ; i++)
+	{	
+		_delay_ms(500);
+		led2 <<= 1;
+		led >>=1;
+		PORTA = ~led2;
+		PORTC = led;
+	}
+}

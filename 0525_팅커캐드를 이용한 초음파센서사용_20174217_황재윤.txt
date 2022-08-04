@@ -1,0 +1,58 @@
+
+// include the library code:
+#include <LiquidCrystal.h>
+int pulseWidth = 0;
+// initialize the library with the numbers of the interface pins
+LiquidCrystal lcd(10, 11, 5, 4, 3, 2);
+
+void setup() {
+  // set up the LCD's number of columns and rows:
+ 
+  pinMode(13,OUTPUT);
+  pinMode(12,INPUT);
+  pinMode(9,OUTPUT);
+  pinMode(8,OUTPUT);
+  pinMode(7,OUTPUT);
+  
+  digitalWrite(13,LOW);
+  lcd.begin(16, 2);
+  // Print a message to the LCD.
+  lcd.print("Distance : ");
+  lcd.setCursor(10,1);
+  lcd.print("cm");
+}
+
+void loop() {
+  
+  int distance = 0;
+  
+  digitalWrite(13,HIGH);
+  delayMicroseconds(10);
+  digitalWrite(13,LOW);
+  pulseWidth = pulseIn(12,HIGH);
+  distance = pulseWidth/58;
+    
+  lcd.setCursor(5, 1);
+  lcd.print(distance);
+    
+  if(distance<=100 && distance>=2)
+  {
+   if((distance<=100) && (distance>=50))
+   {
+      pinMode(9,HIGH);
+      pinMode(8,LOW);
+      pinMode(7,LOW);
+   } else if((distance<=50) && (distance>=20))
+   {
+      pinMode(9,LOW);
+      pinMode(8,HIGH);
+      pinMode(7,LOW);
+   } else if ((distance<=20) && (distance>=2))
+   {
+      pinMode(9,LOW);
+      pinMode(8,LOW);
+      pinMode(7,HIGH);
+   }
+  }
+}
+ 

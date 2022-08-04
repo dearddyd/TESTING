@@ -1,0 +1,41 @@
+#include<avr/io.h>
+#include<util/delay.h>
+
+int main(void)
+{
+	unsigned char i,  j, led, led2;
+	int count =0;
+	DDRA=0xFF;
+	DDRC=0xFF;
+
+	while(count < 8)
+	{
+		i = 0;
+		j = 0;
+		led = 0x80; // PORT C 
+		led2 = 0x01; // PORT A 
+
+		PORTA = ~led2;
+		PORTC = 0x00;
+		_delay_ms(500);
+
+		for(i = 0; i < 7; i++)
+		{
+			led2 <<= 1;
+			PORTA = ~led2;
+			_delay_ms(500);
+		}
+
+		PORTA = ~0x00;
+		PORTC = led;
+		_delay_ms(500);
+
+		for(j = 0;  j < 7; j++)
+		{	
+			led >>= 1;
+			PORTC = led;
+			_delay_ms(500);
+		}
+		count= count +1;
+	}
+}
